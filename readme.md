@@ -119,6 +119,7 @@ public class Cat {
 
   public void poo() {
     this.poo = true;
+    this.sated = false;
   }
 }
 
