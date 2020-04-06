@@ -55,7 +55,7 @@ Then, we have to compromise and write pure functions where possibile mixing it t
 
 ### Why pure functions are so important?
 
-They give us guarantees: we know that they take some types of parameters and return some others stuff. We also know that, as we said, they don't touch external variables or fire side-effects. We are sure that composing pure functions we will obtain the expected results!
+They give us guarantees: we know that they take some types of parameters and return *always* a value. We also know that, as we said, they don't touch external variables or fire side-effects. We are sure that composing pure functions we will obtain the expected results!
 Others benefits are:
 
 - parallelization
