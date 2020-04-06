@@ -84,6 +84,7 @@ Using `Option[T]` we have a function with a total codomain, throwing away except
 
 ### From OOP to FP: an example
 
+OOP with Java
 ```java
 public class Bird {
   private Double weight;
@@ -129,6 +130,7 @@ cat.eat();
 cat.poo();
 ```
 
+FP with Scala
 ```scala
 object Chasing extends App {
   final case class Bird(weight: Double)
