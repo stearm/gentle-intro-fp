@@ -47,7 +47,7 @@ Also think about what can happen if multiple threads call `updateBalance`.
 _A pure function is a function that given same input returns always the same output without produce any side-effect._
 
 In other words, we would like to get closer to the mathematical definition of function, in which we are sure that everything works, thanks to formal models proven over the centuries.
-What is a "side-effect"? Think about something that mutate external systems like IO operations, access to variables outside local scope or throwing exceptions.
+What is a "side-effect"? Think about something that mutate external systems like IO operations, access to variables __outside local scope__ or throwing exceptions. It is legal to have local mutations.
 But real life is full of side-effect, how can we face against this problem? Well, it is not possible to avoid side-effects, but we can model it, describe it through a model (to make "things" referential transparent) and stem them to the borders of our programs.
 We will face this kind of problem in next sessions. 🤓
 
@@ -60,6 +60,8 @@ Others benefits are:
 
 - parallelization
 - memoization
+
+When we can compose two functions `f` and `g` (`f ∘ g == f(g(x))`)? The domain of `f` must be a subset of `g` domain.
 
 ### Partial functions
 
