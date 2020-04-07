@@ -155,3 +155,13 @@ object Chasing extends App {
   println(healthyCat.weight)
 }
 ```
+
+__References:__
+- https://github.com/gcanti/functional-programming
+- https://www.youtube.com/watch?v=tKfVI2hGtGQ
+- https://medium.com/@olxc/referential-transparency-93352c2dd713
+- https://www.sitepoint.com/functional-programming-pure-functions/
+
+__Misc:__
+- https://stackoverflow.com/questions/4865616/purity-vs-referential-transparency
+- https://www.reddit.com/r/haskell/comments/21y560/-
