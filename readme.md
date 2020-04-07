@@ -1,24 +1,36 @@
-# A gently introduction to functional programming
+# A gentle introduction to functional programming
+Welcome to this light introduction to functional programming. Here we will try to explain in few words why functional
+programming can be applied successfully to reduce the complexity of algorithms and ensure the correctness of the code.
 
-## Goal of fp
+## Goals of fp
 
-Mastering complexity of a system using formal models
+The primary goal of functional programming is expressing complex flows with simple expressions, or, functions.
+FP heavily borrows from mathematics, as its primary unit is a "function", that can be defined as a building brick
+that given an input produces an output.
 
 ## Pillars
 
-- referential transparency
-- composition
+The founding principle on which FP is based are:
 
-## Referential transparency
+1. The ability to replace any block of code with the calculated value without altering the program's behaviour
+   (a.k.a.) referential transparency. This implicitly means that a function that returns nothing cannot exist.
+2. The ability to compose functions one with another to obtain a completely new function that does a composite
+   behaviour
+3. Using no side effects: every function should be "pure", in a sense that there are no side effects or mutable
+   states. For example there are no setter functions (which do not return values, so they are not purely functional),
+   there are no functions that make IO, and most importantly, there are NO EXCEPTIONS. A function will always
+   return a value, whether the computation goes well, or not.
+   
+Any side effect, such as saving to a DB or file system will be postponed until the very end of the program, in order
+to leave the functions pure.
 
-An expression has the referential transparency property if it can be replaced with the corrispondent value, without alters program behaviour.
-Therefore we can understand what code does without worrying about weird behaviours.
+## Anything is a function
 
-We are saying implicitly that in a functional world functions that return nothing cannot exists. This is totally opposed to what we do in OOP. Just think to setter methods, through we mutate object data over-time.
-
-## Expression vs Statement
-
-What is an expression? Everything that returns a value, we love expressions in FP. For example, in Scala everything is an expression, even the `if` statement!
+Or, better, an expression. The definition of expression is "anything that returns a value".
+In purely functional languages everything is an expression, so there is no need for a `return` statement (even the
+`if` statement is an expression)
+In non purely functional languages, such as Java, we can (since java 8) simulate functional programming using lambdas
+and method references, though it's a bit more difficult and verbose.
 
 **Referential transparency is all about expressions**
 
@@ -39,12 +51,15 @@ def updateBalance(amount: Int): Int = {
 updateBalance(150) == updateBalance(150)
 ```
 
-In the last snippet we can face against unexpected results caused by an hidden global dependency. User cannot understand how computation end reading only function body.
+In the last snippet we can face unexpected results caused by a hidden global dependency.
+An external programmer cannot understand how the computation will result by only reading the function body.
 Also think about what can happen if multiple threads call `updateBalance`.
 
 ## Pure functions
 
-_A pure function is a function that given same input returns always the same output without produce any side-effect._
+_A pure function is a function that, given the same input, always returns the same output without producing any side-effect._
+
+--- TODO
 
 In other words, we would like to get closer to the mathematical definition of function, in which we are sure that everything works, thanks to formal models proven over the centuries.
 What is a "side-effect"? Think about something that mutate external systems like IO operations, access to variables __outside local scope__ or throwing exceptions. It is legal to have local mutations.
