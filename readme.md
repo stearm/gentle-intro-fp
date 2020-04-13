@@ -1,4 +1,5 @@
 # A gentle introduction to functional programming
+
 Welcome to this light introduction to functional programming. Here we will try to explain in few words why functional
 programming can be applied successfully to reduce the complexity of algorithms and ensure the correctness of the code.
 
@@ -20,7 +21,7 @@ The founding principle on which FP is based are:
    states. For example there are no setter functions (which do not return values, so they are not purely functional),
    there are no functions that make IO, and most importantly, there are NO EXCEPTIONS. A function will always
    return a value, whether the computation goes well, or not.
-   
+
 Any side effect, such as saving to a DB or file system will be postponed until the very end of the program, in order
 to leave the functions pure.
 
@@ -62,7 +63,7 @@ _A pure function is a function that, given the same input, always returns the sa
 --- TODO
 
 In other words, we would like to get closer to the mathematical definition of function, in which we are sure that everything works, thanks to formal models proven over the centuries.
-What is a "side-effect"? Think about something that mutate external systems like IO operations, access to variables __outside local scope__ or throwing exceptions. It is legal to have local mutations.
+What is a "side-effect"? Think about something that mutate external systems like IO operations, access to variables **outside local scope** or throwing exceptions. It is legal to have local mutations.
 But real life is full of side-effect, how can we face against this problem? Well, it is not possible to avoid side-effects, but we can model it, describe it through a model (to make "things" referential transparent) and stem them to the borders of our programs.
 We will face this kind of problem in next sessions. 🤓
 
@@ -70,7 +71,7 @@ Then, we have to compromise and write pure functions where possibile mixing it t
 
 ### Why pure functions are so important?
 
-They give us guarantees: we know that they take some types of parameters and return *always* a value. We also know that, as we said, they don't touch external variables or fire side-effects. We are sure that composing pure functions we will obtain the expected results!
+They give us guarantees: we know that they take some types of parameters and return _always_ a value. We also know that, as we said, they don't touch external variables or fire side-effects. We are sure that composing pure functions we will obtain the expected results!
 Others benefits are:
 
 - parallelization
@@ -80,7 +81,7 @@ When we can compose two functions `f` and `g` (`f ∘ g == f(g(x))`)? The domain
 
 ### Partial functions
 
-Functions that could not return values exists in math? Obviously not.
+We want to live a world where every function is a total function.
 Lets consider this function:
 
 ```scala
@@ -99,9 +100,14 @@ val inverse: (Double) => Option[Double] = {
 
 Using `Option[T]` we have a function with a total codomain, throwing away exceptions.
 
+And what about reason of failure? You can use `Either[L, R]`!
+
+// TODO
+
 ### From OOP to FP: an example
 
 OOP with Java
+
 ```java
 public class Bird {
   private Double weight;
@@ -149,6 +155,7 @@ cat.poo();
 ```
 
 FP with Scala
+
 ```scala
 object Chasing extends App {
   final case class Bird(weight: Double)
@@ -171,12 +178,14 @@ object Chasing extends App {
 }
 ```
 
-__References:__
+**References:**
+
 - https://github.com/gcanti/functional-programming
 - https://www.youtube.com/watch?v=tKfVI2hGtGQ
 - https://medium.com/@olxc/referential-transparency-93352c2dd713
 - https://www.sitepoint.com/functional-programming-pure-functions/
 
-__Misc:__
+**Misc:**
+
 - https://stackoverflow.com/questions/4865616/purity-vs-referential-transparency
 - https://www.reddit.com/r/haskell/comments/21y560/-
