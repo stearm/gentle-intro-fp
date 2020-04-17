@@ -33,7 +33,8 @@ Function<Integer, Integer> fun = x -> x + 2
 instead of the more verbose
 
 ```
-Function<Integer, Integer> fun = Function<> {
+Function<Integer, Integer> fun = new Function<> {
+    @Override
     Integer apply(Integer x) {
         return x + 2;
     }
