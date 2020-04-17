@@ -129,7 +129,7 @@ class SalaryCalculator {
 ```
 
 This is a bit better, though it's still long and the codebase will grow, we solved
-problems number 2, number 3.ii and 4.iv as we don't need to modify the places where
+problems number 2, number 3.ii and 3.iv as we don't need to modify the places where
 we don't intend to use a new modifier.
 
 But we can do better than this, so let's give it a try with our new friend `Function`!
@@ -160,98 +160,117 @@ we unit test this once, we will never have to do it again.
 
 We will use this code like this:
 
-```
-Function<Double, Double> bonusRule = x -> x * 1.2;
-Function<Double, Double> taxesRule = x -> x * 0.7;
-
-new SalaryCalculator()
-    .with(bonusRule)
-    .with(taxesRule)
-    .calculateSalary(2000.0);
+```java
+class App {
+    public void main(String[] args) {
+        Function<Double, Double> bonusRule = x -> x * 1.2;
+        Function<Double, Double> taxesRule = x -> x * 0.7;
+        
+        new SalaryCalculator()
+            .with(bonusRule)
+            .with(taxesRule)
+            .calculateSalary(2000.0);
+    }
+}
 ```
 
 But there's one last thing we can do: in this example we are still thinking with the old
 imperative mindset. Let's work on that and use a purely functional style.
 
 As we've seen before, functions can be combined, and in this case all we have to do is
-combine all the functions and then apply it to the base salary, a bit like this:
+combine all the functions and then apply the result to the base salary, a bit like this:
 `taxesRule(bonusRule(salaryBase))`.
 
 So let's rewrite our calculate salary function in light of this:
 
 
-```
-public double calculateSalary(double baseSalary) {
-    Function<Double, Double> result = salary -> salary;
-    for (Function<Double, Double> rule: rules) {
-        result = result.andThen(rule);
+```java
+class SalaryCalculator {
+
+    // omissis
+
+    public double calculateSalary(double baseSalary) {
+        Function<Double, Double> result = salary -> salary;
+        for (Function<Double, Double> rule: rules) {
+            result = result.andThen(rule);
+        }
+        return result.apply(baseSalary);
     }
-    return result.apply(baseSalary);
 }
 ````
 
 Also, as we said before, `salary -> salary` can be replaced with `Function.identity()
 
-```
-public double calculateSalary(double baseSalary) {
-    Function<Double, Double> result = Function.identity();
-    for (Function<Double, Double> rule: rules) {
-        result = result.andThen(rule);
+```java
+class SalaryCalculator {
+
+    // omissis
+
+    public double calculateSalary(double baseSalary) {
+        Function<Double, Double> result = Function.identity();
+        for (Function<Double, Double> rule: rules) {
+            result = result.andThen(rule);
+        }
+        return result.apply(baseSalary);
     }
-    return result.apply(baseSalary);
 }
 ````
 
 Scrumptious. That was easy, wasn't it? But we can do even better!
 
-How? With the Streaming API.
-
-Another great functional facility introduced by Java8 was the streaming API.
+How? We will remove the mutable state with the Streaming API, another great functional facility
+introduced by Java8.
 
 On any `Collection` object, we can call the `stream()` function that allows us to define
-a series of operations to do on that collection. These operations are chained until a terminal
-operation is executed.
+a series of operations to execute on that collection. These operations are chained until a terminal
+operation is specified; this means that if you do not specify a terminal operation, the stream
+will be in a pending state, and all code inside it will not be executed.
 
 An example would be taking all elements into a list, transforming them and then collecting
 them again into another list:
 
 ```
 aList.stream()
-    .map(x -> x.toString())
+    .map(x -> x + 1)
     .collect(Collectors.toList());
 ```
 
-In our case, what we need is the function called `reduce`: this function will take all
-elements of a stream and perform a "reduction" operation, meaning that it will take each
-element and combine it with the result of the former iteration. The "zero-th" iteration result
-must be provided.
+Back to our case, what we need is the function called `reduce`: this function will take all
+elements of a stream and perform a "reduction" operation, meaning it will take each
+element and combine (or accumulate) it with the result of the former iteration.
+The "zero-th" iteration result must be provided, along with the accumulator which will combine
+the iteration results.
 
-The definition of the reduce is as follows:
+The definition of the reduce is as follows (pseudo code):
 
 ```
-public T reduce(T identity, Stream<T> thisStream) {
 T result = identity;
 for (T element: thisStream)
     result = accumulator.apply(result, element);
 return result;
-}
 ``` 
 
 does it ring a bell? Of course it does, it's the same code we wrote before. Here are our
 substitutions:
 
+* `T` = `Function<Double, Double>`
 * `identity` = `Function.identity()`
-* `accumulator` is a bit more tricky: it's a function that takes two parameters and returns
-  a result, in our case `(result, rule) -> result.andThen(rule)`. This is also called
-  `BiFunction<T, U, R>`
+* `accumulator` is a bit more tricky: as you can see by the apply method, it's a function,
+  but this one takes **two** parameters and returns a result,
+  in our case `(result, rule) -> result.andThen(rule)`. This is also called `BiFunction<T, U, R>`
   
 Time to wrap up then!
 
-```
-public double calculateSalary(double baseSalary) {
-    return rules.stream()
-        .reduce(Function.identity(), (result, rule) -> result.andThen(rule))
-        .apply(baseSalary);
+```java
+class SalaryCalculator {
+   
+    // omissis
+
+    public double calculateSalary(double baseSalary) {
+        return rules.stream()
+            .reduce(Function.identity(), (result, rule) -> result.andThen(rule))
+            .apply(baseSalary);
+    }
 }
 ```
 
@@ -260,13 +279,22 @@ approach.
 Also, notice one thing: `(result, rule) -> result.andThen(rule)` can be further simplified
 because of the two parameters that we have as input, we use both of them and in that precise
 order, so we can substitute this with a **method reference**: `Function::andThen`
-resulting in
+resulting in our full class:
 
-```
-public double calculateSalary(double baseSalary) {
-    return rules.stream()
-        .reduce(Function.identity(), Function::andThen)
-        .apply(baseSalary);
+```java
+class SalaryCalculator {
+   
+    private final List<Function<Double, Double>> rules = new ArrayList<>();
+    
+    public SalaryCalculator with(Function<Double, Double> rule) {
+        rules.add(rule);
+        return this;
+    }
+
+    public double calculateSalary(double baseSalary) {
+        return rules.stream()
+            .reduce(Function.identity(), Function::andThen)
+            .apply(baseSalary);
+    }
 }
 ```
-
