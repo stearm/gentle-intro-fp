@@ -298,3 +298,71 @@ class SalaryCalculator {
     }
 }
 ```
+
+Now the code is concise, does not use `if` statements that make difficult reading the code.
+
+Are we done? Well yes, but actually no.
+
+Consider this case:
+
+```java
+class App {
+    public void main(String[] args) {
+        Function<Double, Double> bonusRule = x -> x * 1.2;
+        Function<Double, Double> taxesRule = x -> x * 0.7;
+        
+        var calculator = new SalaryCalculator()
+            .with(bonusRule)
+            .with(taxesRule);
+        
+        var mySalary = calculator.calculateSalary(2000.0);
+
+        // Now for a particular case I need to use the same calculator but with an additional tax
+        var otherSalary = calculator.with(x -> x * 0.99).calculateSalary(2000.0);
+
+        // What happens if I have to calculate another salary after this?
+        var originalSalary = calculator.calculateSalary(2000.0);
+    }
+}
+```
+
+That's correct: `originalSalary == otherSalary`. This is because our
+`SalaryCalculator` **is not immutable**.
+
+In functional programming, everything should be immutable, in that way we can correctly predict
+the output of any function call without having to think about side effects. So, let's make one
+final edit to our class and make it immutable
+
+```java
+class SalaryCalculator {
+   
+    private final List<Function<Double, Double>> rules = new ArrayList<>();
+
+    public SalaryCalculator() { }
+    
+    public SalaryCalculator(List<Function<Double, Double>> rules) {
+        this.rules = rules;
+    }
+
+    public SalaryCalculator with(Function<Double, Double> rule) {
+        var nRules = new ArrayList<>(rules);
+        nRules.add(rule);
+        return new SalaryCalculator(nRules);
+    }
+
+    public double calculateSalary(double baseSalary) {
+        return rules.stream()
+            .reduce(Function.identity(), Function::andThen)
+            .apply(baseSalary);
+    }
+}
+```
+
+And that's it: our calculator is now immutable: each time the `with` function is called, it will
+return a new instance of a calculator, so our "old" versions of it will remain untouched, and we
+will be sure there are no side effects.
+
+*Warning*: some languages do not fully "support" immutability, for example Java here could have
+problems with garbage collecting the temporary calculators!
+
+A solution for this? Switch to really functional oriented programming languages :)
